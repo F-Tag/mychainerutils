@@ -3,7 +3,7 @@ import chainer
 import chainer.functions as F
 import chainer.links as L
 
-import functions as mF
+from . import functions as mF
 
 
 class Convolution1D(L.Convolution2D):
