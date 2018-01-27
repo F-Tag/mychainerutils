@@ -26,9 +26,9 @@ def pad_sequence_1d(xs, length=None, padding=0):
     return F.swapaxes(F.pad_sequence(xs), 1, 2)
 
 def arr2list(arr, length):
-    xs = F.separate(arr)
+    xs = F.separate(F.swapaxes(arr, 1, 2))
     assert len(xs) == len(length)
-    return [F.transpose(x)[:l] for x, l in zip(xs, length)]
+    return [x[:l] for x, l in zip(xs, length)]
 
 def sum_absolute_error(x0, x1):
     return F.sum(F.absolute_error(x0, x1))
