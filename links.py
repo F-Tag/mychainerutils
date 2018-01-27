@@ -54,31 +54,6 @@ class ResBlock1D(chainer.Chain):
         return h + x
 
 
-class ResNet1D(chainer.Chain):
-    """
-    Residual network for variable length minibatch
-    """
-
-    def __init__(self, out_channels, channels, layers=3, ksize=3, stride=1, dropout=0.0, acfun='leaky_relu'):
-        self.dropout = dropout
-        self.finetune = False
-        resblocks = chainer.ChainList()
-        [resblocks.add_link(ResBlock1D(
-            channels, ksize, stride, dropout, acfun)) for _ in range(layers)]
-        super().__init__()
-        with self.init_scope():
-            self.conv_in = Convolution1D(None, channels, 1, nobias=True)
-            self.conv_out = Convolution1D(None, out_channels, 1)
-            self.resblocks = resblocks
-
-    def __call__(self, xs):
-        length = [len(x) for x in xs]
-        x = mF.pad_sequence_1d(xs)
-        h = self.conv_in(x)
-        for block in self.resblocks:
-            h = block(h, finetune=self.finetune)
-        return mF.arr2list(self.conv_out(h), length)
-
 
 class TSRegressor(L.Classifier):
 
