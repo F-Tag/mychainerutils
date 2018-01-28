@@ -54,7 +54,6 @@ class ResBlock1D(chainer.Chain):
         return h + x
 
 
-
 class TSRegressor(L.Classifier):
 
     def __init__(self, predictor, lossfun=mF.sum_absolute_error):
@@ -80,3 +79,40 @@ class TSRegressor(L.Classifier):
         self.loss = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0))
         chainer.reporter.report({'loss': self.loss}, self)
         return self.loss
+
+
+class HighWayLayers(chainer.Chain):
+    """
+    Nstep HighWay
+    """
+
+    def __init__(self, in_out_size, n_layers, nobias=False, activate='relu', init_Wh=None, init_Wt=None, init_bh=None, init_bt=-1):
+        layers = chainer.ChainList()
+        [layers.add_link(L.Highway(in_out_size, nobias, mF.get_function(
+            activate), init_Wh, init_Wt, init_bh, init_bt)) for _ in range(n_layers)]
+        super().__init__()
+        with self.init_scope():
+            self.layers = layers
+
+    def __call__(self, x):
+        for layer in self.layers:
+            x = layer(x)
+
+        return x
+
+
+class ConvBN1D(chainer.Chain):
+    """
+    conv1D + BN
+    """
+
+    def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, initialW=None, initial_bias=None):
+        self.finetune = False
+        super().__init__()
+        with self.init_scope():
+            self.conv = Convolution1D(
+                in_channels, out_channels, ksize, stride, pad, True, initialW, initial_bias)
+            self.bn = L.BatchNormalization(out_channels)
+
+    def __call__(self, x):
+        return self.bn(self.conv(x), finetune=self.finetune)
