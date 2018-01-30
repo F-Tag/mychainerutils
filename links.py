@@ -134,3 +134,22 @@ class DilatedConvolution1D(L.DilatedConvolution2D):
         x = super().__call__(x)
         x = F.reshape(x, (x.shape[0], x.shape[1], -1))
         return x
+
+
+class Deconvolution1D(L.Deconvolution2D):
+    def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, nobias=False, outsize=None, initialW=None, initial_bias=None):
+
+        if ksize is None:
+            out_channels, ksize, in_channels = in_channels, out_channels, None
+
+        super().__init__(in_channels, out_channels, (ksize, 1), (stride, 1),
+                         (pad, 0), nobias, initialW, initial_bias)
+
+    def __call__(self, x):
+        """
+        x is 3D ndarray（batch size  x input chanel x length)
+        """
+        x = F.reshape(x, (x.shape[0], x.shape[1], -1, 1))
+        x = super().__call__(x)
+        x = F.reshape(x, (x.shape[0], x.shape[1], -1))
+        return x
