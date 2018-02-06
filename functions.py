@@ -37,4 +37,4 @@ def sum_squared_error(x0, x1):
     return F.sum(F.squared_difference(x0, x1))
 
 def l1_bd(y,t):
-    return sum_absolute_error(y,t) + F.bernoulli_nll(y, t)
+    return sum_absolute_error(y,t) + F.bernoulli_nll(t, y)
