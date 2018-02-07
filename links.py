@@ -26,34 +26,6 @@ class Convolution1D(L.Convolution2D):
         return x
 
 
-class ResBlock1D(chainer.Chain):
-    """
-    Residual Block 1D
-    """
-
-    def __init__(self, channels, ksize=3, stride=1, dropout=0.0, acfun='leaky_relu'):
-        self.f = mF.get_function(acfun)
-        self.dropout = dropout
-        super().__init__()
-        with self.init_scope():
-            self.bn1 = L.BatchNormalization(channels)
-            self.bn2 = L.BatchNormalization(channels)
-            self.conv1 = Convolution1D(
-                channels, channels, ksize, stride, ksize // 2, nobias=True)
-            self.conv2 = Convolution1D(
-                channels, channels, ksize, stride, ksize // 2, nobias=True)
-
-    def __call__(self, x, finetune=False):
-        h = self.bn1(x, finetune=finetune)
-        h = self.f(h)
-        h = self.conv1(h)
-        h = self.bn2(h, finetune=finetune)
-        h = self.f(h)
-        h = F.dropout(h, self.dropout)
-        h = self.conv2(h)
-        return h + x
-
-
 class TSRegressor(L.Classifier):
 
     def __init__(self, predictor, lossfun=mF.sum_absolute_error):
