@@ -1,4 +1,6 @@
 
+from math import ceil
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
@@ -125,3 +127,20 @@ class Deconvolution1D(L.Deconvolution2D):
         x = super().__call__(x)
         x = F.reshape(x, (x.shape[0], x.shape[1], -1))
         return x
+
+
+class HighWayConv1D(DilatedConvolution1D):
+    def __init__(self, inout_channels, ksize, dilate=1, nobias=False, initialW=None, initial_bias=None, causal=False):
+        if causal:
+            pad = (ksize - 1) * dilate
+        else:
+            pad = ceil((ksize - 1) * dilate / 2)
+        super().__init__(inout_channels, inout_channels * 2, ksize=ksize, stride=1, pad=pad,
+                         dilate=dilate, nobias=nobias, initialW=initialW, initial_bias=initial_bias)
+
+    def __call__(self, x):
+        length = x.shape[-1]
+        h1 = super().__call__(x)[..., :length]
+        h2, h3 = F.split_axis(h1, 2, 1)
+        h4 = F.sigmoid(h2)
+        return h4 * h3 + (1 - h4) * x
