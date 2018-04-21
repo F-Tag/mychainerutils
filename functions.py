@@ -45,4 +45,4 @@ def add_noise(h, sigma=0.2):
     if chainer.config.train:
         return h + sigma * xp.random.randn(*h.shape)
     else:
-    return h
+        return h
