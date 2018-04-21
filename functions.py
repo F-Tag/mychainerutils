@@ -1,4 +1,5 @@
 
+import chainer
 import chainer.functions as F
 
 
@@ -41,7 +42,7 @@ def l1_bd(y,t):
 
 def add_noise(h, sigma=0.2):
     # https://github.com/chainer/chainer/blob/master/examples/dcgan/net.py
-    xp = cuda.get_array_module(h.array)
+    xp = chainer.cuda.get_array_module(h.array)
     if chainer.config.train:
         return h + sigma * xp.random.randn(*h.shape)
     else:
