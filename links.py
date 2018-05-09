@@ -10,13 +10,9 @@ from . import functions as mF
 
 class Convolution1D(L.Convolution2D):
 
-    def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None):
-
-        if ksize is None:
-            out_channels, ksize, in_channels = in_channels, out_channels, None
-
+    def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1):
         super().__init__(in_channels, out_channels, (ksize, 1), (stride, 1),
-                         (pad, 0), nobias, initialW, initial_bias)
+                         (pad, 0), nobias, initialW, initial_bias, dilate, groups)
 
     def __call__(self, x):
         """
