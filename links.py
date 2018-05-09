@@ -12,7 +12,7 @@ class Convolution1D(L.Convolution2D):
 
     def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1):
         super().__init__(in_channels, out_channels, (ksize, 1), (stride, 1),
-                         (pad, 0), nobias, initialW, initial_bias, dilate, groups)
+                         (pad, 0), nobias, initialW, initial_bias, dilate=dilate, groups=groups)
 
     def __call__(self, x):
         """
