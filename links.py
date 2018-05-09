@@ -126,3 +126,7 @@ class HighWayConv1D(DilatedConvolution1D):
 class Deconvolution1D(L.DeconvolutionND):
     def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, outsize=None, initialW=None, initial_bias=None):
         super().__init__(1, in_channels, out_channels, ksize, stride, pad, nobias, outsize, initialW, initial_bias)
+
+class Convolution3D(L.ConvolutionND):
+    def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, cover_all=False):
+        super().__init__(3, in_channels, out_channels, ksize, stride, pad, nobias, initialW, initial_bias, cover_all)
