@@ -14,7 +14,7 @@ class Convolution1D(L.Convolution2D):
         if ksize is None:
             out_channels, ksize, in_channels = in_channels, out_channels, None
         super().__init__(in_channels, out_channels, (ksize, 1), (stride, 1),
-                         (pad, 0), nobias, initialW, initial_bias, dilate=dilate, groups=groups)
+                         (pad, 0), nobias, initialW, initial_bias, dilate=(dilate, 1), groups=groups)
 
     def __call__(self, x):
         """
