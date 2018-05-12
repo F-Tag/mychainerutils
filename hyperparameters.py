@@ -33,8 +33,11 @@ class HyperParameters(dict):
         srcdic = deepcopy(srcdic)
 
         for key in keys:
-            self[key] = srcdic.pop(key)
-
+            if key in srcdic:
+                val = srcdic.pop(key)
+                if val is not None:    
+                    self[key] = val
+                    
         return srcdic
     
 
