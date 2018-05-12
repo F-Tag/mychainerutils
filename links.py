@@ -108,14 +108,29 @@ class DilatedConvolution1D(L.DilatedConvolution2D):
         return x
 
 
-class HighWayConv1D(DilatedConvolution1D):
-    def __init__(self, inout_channels, ksize, dilate=1, nobias=False, initialW=None, initial_bias=None, causal=False):
-        if causal:
+class Deconvolution1D(L.DeconvolutionND):
+    def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, outsize=None, initialW=None, initial_bias=None):
+        super().__init__(1, in_channels, out_channels, ksize,
+                         stride, pad, nobias, outsize, initialW, initial_bias)
+
+
+class Convolution3D(L.ConvolutionND):
+    def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, cover_all=False):
+        super().__init__(3, in_channels, out_channels, ksize,
+                         stride, pad, nobias, initialW, initial_bias, cover_all)
+
+
+class HighWayConv1D(Convolution1D):
+    def __init__(self, in_out_channels, ksize, stride=1, pad='center', nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1):
+        if pad == 'causal':
             pad = (ksize - 1) * dilate
-        else:
+        elif pad == 'center':
             pad = ceil((ksize - 1) * dilate / 2)
-        super().__init__(inout_channels, inout_channels * 2, ksize=ksize, stride=1, pad=pad,
-                         dilate=dilate, nobias=nobias, initialW=initialW, initial_bias=initial_bias)
+        else:
+            raise ValueError
+
+        super().__init__(in_out_channels, in_out_channels * 2, ksize, stride,
+                         pad, nobias, initialW, initial_bias, dilate=dilate, groups=groups)
 
     def __call__(self, x):
         length = x.shape[-1]
@@ -123,12 +138,3 @@ class HighWayConv1D(DilatedConvolution1D):
         h2, h3 = F.split_axis(h1, 2, 1)
         h4 = F.sigmoid(h2)
         return h4 * h3 + (1 - h4) * x
-
-
-class Deconvolution1D(L.DeconvolutionND):
-    def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, outsize=None, initialW=None, initial_bias=None):
-        super().__init__(1, in_channels, out_channels, ksize, stride, pad, nobias, outsize, initialW, initial_bias)
-
-class Convolution3D(L.ConvolutionND):
-    def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, cover_all=False):
-        super().__init__(3, in_channels, out_channels, ksize, stride, pad, nobias, initialW, initial_bias, cover_all)
