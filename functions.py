@@ -69,7 +69,7 @@ def stft(x, frame_length=1024, hop_length=512):
     x = F.concat((x, pad), -1)
     index = frame(np.arange(x.shape[-1]), frame_length, hop_length).T
     tmp = x[..., index] * xp.hamming(frame_length).astype(x.dtype)
-    yr, yi = F.fft((tmp, np.zeros(tmp.shape).astype(x.dtype)))
+    yr, yi = F.fft((tmp, xp.zeros(tmp.shape).astype(x.dtype)))
     return yr[..., :frame_length // 2 + 1], yi[..., :frame_length // 2 + 1]
 
 
