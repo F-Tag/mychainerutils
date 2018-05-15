@@ -77,4 +77,4 @@ def power_loss(x, t, frame_length=1024, hop_length=512):
     # ..., FFT axis
     xr, xi = stft(x, frame_length, hop_length)
     tr, ti = stft(t, frame_length, hop_length)
-    return F.mean_squared_error(xr, tr) + F.mean_squared_error(xi, ti)
+    return F.mean_squared_error(xr ** 2 + xi ** 2, tr ** 2 + ti ** 2)
