@@ -73,8 +73,15 @@ def stft(x, frame_length=1024, hop_length=512):
     return yr[..., :frame_length // 2 + 1], yi[..., :frame_length // 2 + 1]
 
 
-def power_loss(x, t, frame_length=1024, hop_length=512):
+def power_loss(x, t, frame_length=1024, hop_length=512, time_axis_mean=False):
     # ..., FFT axis
-    xr, xi = stft(x, frame_length, hop_length)
-    tr, ti = stft(t, frame_length, hop_length)
-    return F.mean_squared_error(xr ** 2 + xi ** 2, tr ** 2 + ti ** 2)
+    Xr, Xi = stft(x, frame_length, hop_length)
+    Xa = Xr ** 2 + Xi ** 2
+    Tr, Ti = stft(t, frame_length, hop_length)
+    Ta = Tr ** 2 + Ti ** 2
+
+    if time_axis_mean:
+        Xa = F.average(Xa, -1)
+        Ta = F.average(Ta, -1)
+
+    return F.mean_squared_error(Xa, Ta)
