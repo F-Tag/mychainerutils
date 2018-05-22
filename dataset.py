@@ -72,9 +72,9 @@ class NPZDataset(DatasetMixin):
             if path is not None:
                 break
 
-        try:
+        if path is None:
+            data = path = None
+        else:
             data = dict(np.load(path))
-        except FileNotFoundError:
-            data = None
 
         return data, path
