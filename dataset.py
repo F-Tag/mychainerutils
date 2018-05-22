@@ -40,10 +40,14 @@ class NPZDataset(DatasetMixin):
         paths = sorted(
             glob(os.path.join(data_dir, '**/*.npz'), recursive=True))
         self._paths = paths
-        with open(os.path.join(dataset_root, param_file), 'r') as f:
-            load = json.load(f)
 
-        self.params = load
+        try:
+            with open(os.path.join(dataset_root, param_file), 'r') as f:
+                load = json.load(f)
+            self.params = load
+
+        except FileNotFoundError:
+           self.params = None 
 
     def __len__(self):
         return len(self._paths)
