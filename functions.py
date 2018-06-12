@@ -13,16 +13,19 @@ def do_nothing(x):
     return x
 
 
-def get_function(name):
+def get_function(function):
 
-    if name == 'swish':
+    if function == 'swish':
         return swish
 
-    elif name == 'do_nothing':
+    elif function == 'do_nothing':
         return do_nothing
 
+    elif isinstance(function, str):
+        return getattr(F, function)
+
     else:
-        return getattr(F, name)
+        return function
 
 
 def pad_sequence_1d(xs, length=None, padding=0):
