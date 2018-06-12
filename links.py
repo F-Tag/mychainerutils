@@ -1,5 +1,6 @@
 
 from math import ceil
+from functools import partial
 
 import chainer
 import chainer.functions as F
@@ -138,3 +139,19 @@ class HighWayConv1D(Convolution1D):
         h2, h3 = F.split_axis(h1, 2, 1)
         h4 = F.sigmoid(h2)
         return h4 * h3 + (1 - h4) * x
+
+
+def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_relu', dropout_r=0.0):
+
+    net = chainer.Sequential()
+    for _ in range(layers):
+        net.append(L.Linear(n_units, nobias=True))
+        if normalize == 'BN':
+            net.append(L.BatchNormalization(n_units))
+        elif normalize == 'LN':
+            net.append(L.LayerNormalization())
+        net.append(mF.get_function(activation))
+        net.append(partial(F.dropout, ratio=dropout_r))
+    net.append(L.Linear(n_out))
+
+    return net
