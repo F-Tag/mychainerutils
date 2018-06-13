@@ -54,6 +54,13 @@ class TSRegressor(L.Classifier):
         return self.loss
 
 
+class Regressor(L.Classifier):
+
+    def __init__(self, predictor, lossfun=F.mean_squared_error):
+        super(Regressor, self).__init__(predictor, lossfun=lossfun)
+        self.compute_accuracy = False
+
+
 class HighWayLayers(chainer.Chain):
     """
     Nstep HighWay
