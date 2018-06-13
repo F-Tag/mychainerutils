@@ -142,7 +142,6 @@ class HighWayConv1D(Convolution1D):
 
 
 def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_relu', dropout_r=0.0):
-
     net = chainer.Sequential()
     for _ in range(layers):
         net.append(L.Linear(n_units, nobias=True))
@@ -153,5 +152,4 @@ def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_re
         net.append(mF.get_function(activation))
         net.append(partial(F.dropout, ratio=dropout_r))
     net.append(L.Linear(n_out))
-
     return net
