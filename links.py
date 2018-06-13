@@ -141,15 +141,20 @@ class HighWayConv1D(Convolution1D):
         return h4 * h3 + (1 - h4) * x
 
 
-def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_relu', dropout_r=0.0):
+def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_relu', dropout=0.0):
     net = chainer.Sequential()
+    if normalize == 'BN' or normalize == 'LN':
+        nobias = True
+    else:
+        nobias = False
+
     for _ in range(layers):
-        net.append(L.Linear(n_units, nobias=True))
+        net.append(L.Linear(n_units, nobias=nobias))
         if normalize == 'BN':
             net.append(L.BatchNormalization(n_units))
         elif normalize == 'LN':
             net.append(L.LayerNormalization())
         net.append(mF.get_function(activation))
-        net.append(partial(F.dropout, ratio=dropout_r))
+        net.append(partial(F.dropout, ratio=dropout))
     net.append(L.Linear(n_out))
     return net
