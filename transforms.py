@@ -14,7 +14,7 @@ def cutout(image_origin, mask_ratio=0.33, rate=0.5):
     if np.random.rand() < rate:
         mask_value = image.mean()
 
-        h, w = image.shape[[1, 2]]
+        h, w = image.shape[1:3]
         mask_h = int(h * mask_ratio)
         mask_w = int(w * mask_ratio)
         top = np.random.randint(0 - mask_h // 2, h - mask_h)
