@@ -8,4 +8,7 @@ def apply_weightdecay_only_w(model, rate):
 
     for p in model.params():
         if p.name == 'W':
-            p.update_rule.add_hook(WeightDecay(rate))
+            if hasattr(p.hyperparam, 'weight_decay_rate'):
+                p.hyperparam.weight_decay_rate = rate
+            else:
+                p.update_rule.add_hook(WeightDecay(rate))
