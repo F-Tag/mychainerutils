@@ -88,3 +88,7 @@ def power_loss(x, t, frame_length=1024, hop_length=512, time_axis_mean=False):
         Ta = F.average(Ta, -1)
 
     return F.mean_squared_error(Xa, Ta)
+
+
+def softsign(x):
+    return 1.0 / (1.0 + F.absolute(x))
