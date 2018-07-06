@@ -18,6 +18,9 @@ def get_function(function):
     if function == 'swish':
         return swish
 
+    elif function == 'softsign':
+        return softsign
+
     elif function == 'do_nothing':
         return do_nothing
 
@@ -91,4 +94,4 @@ def power_loss(x, t, frame_length=1024, hop_length=512, time_axis_mean=False):
 
 
 def softsign(x):
-    return 1.0 / (1.0 + F.absolute(x))
+    return x / (1.0 + F.absolute(x))
