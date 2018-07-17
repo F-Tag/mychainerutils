@@ -95,3 +95,11 @@ def power_loss(x, t, frame_length=1024, hop_length=512, time_axis_mean=False):
 
 def softsign(x):
     return x / (1.0 + F.absolute(x))
+
+
+def bilinear_interpolation_1d(x, rate):
+    length = x.shape[-1]
+    x = x[..., None]
+    x = F.resize_images(x, (length*rate, 1))
+    return F.squeeze(x, -1)
+
