@@ -40,12 +40,10 @@ class NPZDataset(DatasetMixin):
         if include_key is not None:
             include_key = '|'.join(include_key)
             include_checker = re.compile(include_key)
-            print('include_key:', include_key)
 
         if exclude_key is not None:
             exclude_key = '|'.join(exclude_key)
             exclude_checker = re.compile(exclude_key)
-            print('exclude_key:', exclude_key)
 
         dirs = []
         for d in sorted(dataset_root.glob('*')):
@@ -58,8 +56,8 @@ class NPZDataset(DatasetMixin):
                     continue
             else:
                 if exclude_key is not None:
-                    if exclude_checker.search(os.path.basename(d)) is not None:
-                        continue
+                    if exclude_checker.search(os.path.basename(d)) is None:
+                        dirs.append(d)
 
                 else:
                     dirs.append(d)
