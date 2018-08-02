@@ -97,9 +97,17 @@ def softsign(x):
     return x / (1.0 + F.absolute(x))
 
 
-def bilinear_interpolation_1d(x, rate):
+def bilinear_interpolation_1d(x, rate=None, shape=None):
     length = x.shape[-1]
+    if rate is not None:
+        shape = int(length*rate)
+    else:
+        if shape is None:
+            raise Exception('rate or shape')
+        else:
+            shape = int(shape)
+
     x = x[..., None]
-    x = F.resize_images(x, (length*rate, 1))
+    x = F.resize_images(x, (shape, 1))
     return F.squeeze(x, -1)
 
