@@ -70,9 +70,10 @@ def stft(x, frame_length=1024, hop_length=512):
     pad_len = (x.shape[-1] // hop_length - frame_length //
                hop_length + 1) * hop_length + frame_length
     pad = pad_len - x.shape[-1]
-    shape = list(x.shape)
-    pad = xp.zeros(shape[:-1] + [pad]).astype(x.dtype)
-    x = F.concat((x, pad), -1)
+    if pad > 0:
+        shape = list(x.shape)
+        pad = xp.zeros(shape[:-1] + [pad]).astype(x.dtype)
+        x = F.concat((x, pad), -1)
     index = frame(np.arange(x.shape[-1]), frame_length, hop_length).T
     tmp = x[..., index] * xp.hamming(frame_length).astype(x.dtype)
     yr, yi = F.fft((tmp, xp.zeros(tmp.shape).astype(x.dtype)))
