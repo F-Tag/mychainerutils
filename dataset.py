@@ -6,10 +6,13 @@ from copy import deepcopy
 from glob import glob
 from pathlib import Path
 from random import shuffle
+import six
+from chainer.backends import cuda
 
 import chainer
 import numpy as np
 from chainer.dataset import DatasetMixin
+from chainer.dataset import to_device
 
 
 def list_converter(batch, device=None, padding=None):
@@ -132,3 +135,38 @@ class NPZDataset(DatasetMixin):
             data['labels'] = self._labels[idx]
 
         return data, path
+
+
+def list_examples(batch, device=None, padding=None):
+
+    if len(batch) == 0:
+        raise ValueError('batch is empty')
+
+    if padding is not None:
+        raise NotImplementedError
+
+    first_elem = batch[0]
+
+    if isinstance(first_elem, tuple):
+        result = []
+        if not isinstance(padding, tuple):
+            padding = [padding] * len(first_elem)
+
+        for i in six.moves.range(len(first_elem)):
+            result.append([to_device(device, example[i]) for example in batch])
+
+        return tuple(result)
+
+    elif isinstance(first_elem, dict):
+        result = {}
+        if not isinstance(padding, dict):
+            padding = {key: padding for key in first_elem}
+
+        for key in first_elem:
+            result[key] = [to_device(device, example[key])
+                           for example in batch]
+
+        return result
+
+    else:
+        return to_device(device, _concat_arrays(batch, padding))
