@@ -46,11 +46,12 @@ class TSRegressor(L.Classifier):
         assert len(args) >= 2
         x = args[:-1]
         t = args[-1]
+        batch = len(t)
         self.y = None
         self.loss = None
         self.accuracy = None
         self.y = self.predictor(*x)
-        self.loss = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0))
+        self.loss = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0)) / batch
         chainer.reporter.report({'loss': self.loss}, self)
         return self.loss
 
