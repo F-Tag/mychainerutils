@@ -12,7 +12,7 @@ def cutout(image_origin, mask_ratio=0.33, rate=0.5):
 
     image = np.copy(image_origin)
     if np.random.rand() < rate:
-        mask_value = image.mean()
+        mask_value = image.mean().astype(image_origin.dtype)
 
         h, w = image.shape[1:3]
         mask_h = int(h * mask_ratio)
