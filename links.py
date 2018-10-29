@@ -1,6 +1,7 @@
 
 from functools import partial
 from math import ceil
+from warnings import warn
 
 import chainer
 import chainer.functions as F
@@ -13,6 +14,7 @@ from . import functions as mF
 class Convolution1D(L.Convolution2D):
 
     def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, *, dilate=1, groups=1):
+        warn("use chainer.links.Convolution1D", DeprecationWarning)
         if ksize is None:
             out_channels, ksize, in_channels = in_channels, out_channels, None
         super().__init__(in_channels, out_channels, (ksize, 1), (stride, 1),
@@ -103,7 +105,7 @@ class ConvBN1D(chainer.Chain):
 class DilatedConvolution1D(L.DilatedConvolution2D):
 
     def __init__(self, in_channels, out_channels, ksize=None, stride=1, pad=0, dilate=1, nobias=False, initialW=None, initial_bias=None):
-
+        warn("use chainer.links.Convolution1D", DeprecationWarning)
         if ksize is None:
             out_channels, ksize, in_channels = in_channels, out_channels, None
 
@@ -119,12 +121,14 @@ class DilatedConvolution1D(L.DilatedConvolution2D):
 
 
 class Deconvolution1D(L.DeconvolutionND):
+    warn("use chainer.links.Deconvolution1D", DeprecationWarning)
     def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, outsize=None, initialW=None, initial_bias=None):
         super().__init__(1, in_channels, out_channels, ksize,
                          stride, pad, nobias, outsize, initialW, initial_bias)
 
 
 class Convolution3D(L.ConvolutionND):
+    warn("use chainer.links.Convolution3D", DeprecationWarning)
     def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, cover_all=False):
         super().__init__(3, in_channels, out_channels, ksize,
                          stride, pad, nobias, initialW, initial_bias, cover_all)
