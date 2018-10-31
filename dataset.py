@@ -67,33 +67,33 @@ class NPZDataset(DatasetMixin):
 
         paths = []
         labels = []
-        tmp_label_dct = {}
-        index = -1
+        index = 0
+        if label_dct is None:
+            label_dct = {}
         for d in dirs:
             tmp = sorted(list(d.glob('**/*.npz')))
 
             if len(tmp) == 0:
                 continue
 
-            if label_dct is None:
-                index += 1
-                tmp_label_dct[os.path.basename(d)] = index
-            else:
-                if os.path.basename(d) in label_dct:
-                    index = label_dct[os.path.basename(d)]
-                    tmp_label_dct[os.path.basename(d)] = index
-                else:
-                    index = -1
-                    label_dct[os.path.basename(d)] = index
+            key = os.path.basename(d)
+            if key not in label_dct:
+                values = list(label_dct.values())
+                while True:
+                    if index in values:
+                        index += 1
+                    else:
+                        label_dct[key] = index
+                        break
 
             paths += tmp
-            labels += [index] * len(tmp)
+            labels += [label_dct[key]] * len(tmp)
 
         assert len(paths) == len(labels)
 
         self._paths = paths
         self._labels = labels
-        self.label_dct = tmp_label_dct
+        self.label_dct = label_dct
 
         try:
             with open(os.path.join(dataset_root, param_file), 'r') as f:
