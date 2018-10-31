@@ -40,6 +40,11 @@ class NPZDataset(DatasetMixin):
     def __init__(self, dataset_root, include_key=None, exclude_key=None, label_dct=None, param_file="datasetparam.json"):
         dataset_root = Path(dataset_root).expanduser()
 
+        label_level = len(dataset_root.parts)
+        print(label_level)
+        import sys
+        sys.exit()
+
         if include_key is not None:
             include_key = '|'.join(include_key)
             include_checker = re.compile(include_key)
