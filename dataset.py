@@ -97,7 +97,7 @@ class NPZDataset(DatasetMixin):
         self._labels = labels
         self.label_dct = label_dct
 
-        print(self._paths[0].parts[self.label_level])
+        print(self.label_dct[self._paths[0].parts[self.label_level]])
         import sys
         sys.exit()
 
