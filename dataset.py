@@ -40,10 +40,7 @@ class NPZDataset(DatasetMixin):
     def __init__(self, dataset_root, include_key=None, exclude_key=None, label_dct=None, param_file="datasetparam.json"):
         dataset_root = Path(dataset_root).expanduser()
 
-        label_level = len(dataset_root.parts)
-        print(label_level)
-        import sys
-        sys.exit()
+        self.label_level = len(dataset_root.parts)
 
         if include_key is not None:
             include_key = '|'.join(include_key)
@@ -99,6 +96,10 @@ class NPZDataset(DatasetMixin):
         self._paths = paths
         self._labels = labels
         self.label_dct = label_dct
+
+        print(self._paths[0].parts[self.label_level])
+        import sys
+        sys.exit()
 
         try:
             with open(os.path.join(dataset_root, param_file), 'r') as f:
