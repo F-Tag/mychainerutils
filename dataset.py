@@ -94,12 +94,7 @@ class NPZDataset(DatasetMixin):
         assert len(paths) == len(labels)
 
         self._paths = paths
-        self._labels = labels
         self.label_dct = label_dct
-
-        print(self.label_dct[self._paths[0].parts[self.label_level]])
-        import sys
-        sys.exit()
 
         try:
             with open(os.path.join(dataset_root, param_file), 'r') as f:
@@ -115,7 +110,7 @@ class NPZDataset(DatasetMixin):
     def get_example(self, i):
         path = self._paths[i]
         tmp = dict(np.load(path))
-        tmp['label'] = self._labels[i]
+        tmp['label'] = self.label_dct[path.parts[self.label_level]]
         return tmp
 
     def get_example_from_names(self, names, random=True):
