@@ -68,7 +68,7 @@ class NPZDataset(DatasetMixin):
         paths = []
         labels = []
         tmp_label_dct = {}
-        index = 0
+        index = -1
         for d in dirs:
             tmp = sorted(list(d.glob('**/*.npz')))
 
@@ -76,8 +76,8 @@ class NPZDataset(DatasetMixin):
                 continue
 
             if label_dct is None:
-                tmp_label_dct[os.path.basename(d)] = index
                 index += 1
+                tmp_label_dct[os.path.basename(d)] = index
             else:
                 if os.path.basename(d) in label_dct:
                     index = label_dct[os.path.basename(d)]
