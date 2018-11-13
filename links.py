@@ -2,6 +2,8 @@
 from functools import partial
 from math import ceil
 from warnings import warn
+from inspect import signature
+from functools import partial
 
 import chainer
 import chainer.functions as F
@@ -35,6 +37,13 @@ class TSRegressor(L.Classifier):
 
     def __init__(self, predictor,
                  lossfun=F.absolute_error, label_key=-1, return_key=None):
+        
+        try:
+            signature(lossfun).parameters['reduce']
+        except KeyError:
+            pass
+        else:
+            lossfun = partial(lossfun, reduce='no')
 
         super().__init__(predictor,
                          lossfun=F.absolute_error,
