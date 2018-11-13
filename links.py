@@ -29,35 +29,6 @@ class Convolution1D(L.Convolution2D):
         x = F.reshape(x, (x.shape[0], x.shape[1], -1))
         return x
 
-"""
-class TSRegressor(L.Classifier):
-
-    def __init__(self, predictor, lossfun=mF.sum_absolute_error):
-        super().__init__(predictor, lossfun=lossfun)
-        self.compute_accuracy = False
-
-    def __call__(self, *args):
-        """
-        Args:
-            args (list of ~chainer.Variable): Input minibatch.
-
-        Returns:
-            ~chainer.Variable: Loss value.
-        """
-
-        assert len(args) >= 2
-        x = args[:-1]
-        t = args[-1]
-        batch = len(t)
-        self.y = None
-        self.loss = None
-        self.accuracy = None
-        self.y = self.predictor(*x)
-        self.loss = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0)) / batch
-        chainer.reporter.report({'loss': self.loss}, self)
-        return self.loss
-"""
-
 
 class TSRegressor(L.Classifier):
     compute_accuracy = False
@@ -93,7 +64,7 @@ class TSRegressor(L.Classifier):
         self.accuracy = None
         batch = len(t)
         y = self.predictor(*args, **kwargs)
-        if self.return_key is not None and type(y)==tuple:
+        if self.return_key is not None and type(y) == tuple:
             self.y = y[self.return_key]
         else:
             self.y = y
@@ -136,7 +107,7 @@ class Regressor(L.Classifier):
         self.loss = None
         self.accuracy = None
         y = self.predictor(*args, **kwargs)
-        if self.return_key is not None and type(y)==tuple:
+        if self.return_key is not None and type(y) == tuple:
             self.y = y[self.return_key]
         else:
             self.y = y
@@ -202,6 +173,7 @@ class DilatedConvolution1D(L.DilatedConvolution2D):
 
 class Deconvolution1D(L.DeconvolutionND):
     warn("use chainer.links.Deconvolution1D", DeprecationWarning)
+
     def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, outsize=None, initialW=None, initial_bias=None):
         super().__init__(1, in_channels, out_channels, ksize,
                          stride, pad, nobias, outsize, initialW, initial_bias)
@@ -209,6 +181,7 @@ class Deconvolution1D(L.DeconvolutionND):
 
 class Convolution3D(L.ConvolutionND):
     warn("use chainer.links.Convolution3D", DeprecationWarning)
+
     def __init__(self, in_channels, out_channels, ksize, stride=1, pad=0, nobias=False, initialW=None, initial_bias=None, cover_all=False):
         super().__init__(3, in_channels, out_channels, ksize,
                          stride, pad, nobias, initialW, initial_bias, cover_all)
@@ -257,6 +230,7 @@ class GLU1D(chainer.Chain):
     """
     Deep Voice 3's Gated Linear Unit
     """
+
     def __init__(self, in_out_channels, ksize, dilate=1, dropout=0.0, use_cond=True, causal=True, residual=True):
         self.causal = causal
         self.pad = (ksize - 1) * dilate
