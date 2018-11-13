@@ -37,7 +37,7 @@ class TSRegressor(L.Classifier):
                  lossfun=F.absolute_error, label_key=-1, return_key=None):
 
         super().__init__(predictor,
-                         lossfun=F.mean_absolute_error,
+                         lossfun=F.absolute_error,
                          label_key=label_key)
         self.return_key = return_key
 
