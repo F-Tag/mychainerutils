@@ -68,7 +68,7 @@ class TSRegressor(L.Classifier):
             self.y = y[self.return_key]
         else:
             self.y = y
-        diff = self.lossfun(self.y, t)
+        diff = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0))
         self.loss = F.sum(diff) / batch
         chainer.reporter.report({'loss': self.loss}, self)
         return self.loss
