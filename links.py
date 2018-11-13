@@ -29,7 +29,7 @@ class Convolution1D(L.Convolution2D):
         x = F.reshape(x, (x.shape[0], x.shape[1], -1))
         return x
 
-
+"""
 class TSRegressor(L.Classifier):
 
     def __init__(self, predictor, lossfun=mF.sum_absolute_error):
@@ -54,6 +54,51 @@ class TSRegressor(L.Classifier):
         self.accuracy = None
         self.y = self.predictor(*x)
         self.loss = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0)) / batch
+        chainer.reporter.report({'loss': self.loss}, self)
+        return self.loss
+"""
+
+
+class TSRegressor(L.Classifier):
+    compute_accuracy = False
+
+    def __init__(self, predictor,
+                 lossfun=F.absolute_error, label_key=-1, return_key=None):
+
+        super().__init__(predictor,
+                         lossfun=F.mean_absolute_error,
+                         label_key=label_key)
+        self.return_key = return_key
+
+    def __call__(self, *args, **kwargs):
+
+        if isinstance(self.label_key, int):
+            if not (-len(args) <= self.label_key < len(args)):
+                msg = 'Label key %d is out of bounds' % self.label_key
+                raise ValueError(msg)
+            t = args[self.label_key]
+            if self.label_key == -1:
+                args = args[:-1]
+            else:
+                args = args[:self.label_key] + args[self.label_key + 1:]
+        elif isinstance(self.label_key, str):
+            if self.label_key not in kwargs:
+                msg = 'Label key "%s" is not found' % self.label_key
+                raise ValueError(msg)
+            t = kwargs[self.label_key]
+            del kwargs[self.label_key]
+
+        self.y = None
+        self.loss = None
+        self.accuracy = None
+        batch = len(t)
+        y = self.predictor(*args, **kwargs)
+        if self.return_key is not None and type(y)==tuple:
+            self.y = y[self.return_key]
+        else:
+            self.y = y
+        diff = self.lossfun(self.y, t)
+        self.loss = F.sum(diff) / batch
         chainer.reporter.report({'loss': self.loss}, self)
         return self.loss
 
