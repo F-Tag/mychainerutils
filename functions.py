@@ -52,10 +52,6 @@ def sum_squared_error(x0, x1):
     return F.sum(F.squared_difference(x0, x1))
 
 
-def l1_bd(y, t):
-    return sum_absolute_error(y, t) + F.bernoulli_nll(t, y)
-
-
 def add_noise(h, sigma=0.2):
     # https://github.com/chainer/chainer/blob/master/examples/dcgan/net.py
     h = chainer.as_variable(h)
