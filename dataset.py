@@ -226,7 +226,7 @@ class PathDataset(DatasetMixin):
         if path is None:
             data = path = None
 
-        return path, self._labels[idx]
+        return path, self.label_dct[path.parts[self.label_level]]
 
 
 def list_examples(batch, device=None, padding=None):
