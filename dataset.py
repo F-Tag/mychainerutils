@@ -133,7 +133,7 @@ class NPZDataset(DatasetMixin):
             data = path = None
         else:
             data = dict(np.load(path))
-            data['labels'] = self._labels[idx]
+            data['labels'] = self.label_dct[path.parts[self.label_level]]
 
         return data, path
 
