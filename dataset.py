@@ -155,7 +155,7 @@ class PathDataset(DatasetMixin):
             exclude_checker = re.compile(exclude_key)
 
         dirs = []
-        for d in sorted(dataset_root.glob('**/*'+ext)):
+        for d in sorted(dataset_root.glob('*')):
             if not os.path.isdir(d):
                 continue
 
@@ -177,7 +177,7 @@ class PathDataset(DatasetMixin):
         if label_dct is None:
             label_dct = {}
         for d in dirs:
-            tmp = sorted(list(d.glob('**/*.npz')))
+            tmp = sorted(list(d.glob('**/*'+ext)))
 
             if len(tmp) == 0:
                 continue
