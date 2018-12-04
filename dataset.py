@@ -13,6 +13,7 @@ import chainer
 import numpy as np
 from chainer.dataset import DatasetMixin
 from chainer.dataset import to_device
+from chainer.dataset.convert import _concat_arrays
 
 
 def list_converter(batch, device=None, padding=None):
@@ -261,4 +262,5 @@ def list_examples(batch, device=None, padding=None):
         return result
 
     else:
+        raise NotImplementedError
         return to_device(device, _concat_arrays(batch, padding))
