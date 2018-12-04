@@ -140,7 +140,7 @@ class NPZDataset(DatasetMixin):
 
 class PathDataset(DatasetMixin):
 
-    def __init__(self, dataset_root, include_key=None, exclude_key=None, label_dct=None):
+    def __init__(self, ext, dataset_root, include_key=None, exclude_key=None, label_dct=None):
         dataset_root = Path(dataset_root).expanduser()
 
         self.label_level = len(dataset_root.parts)
@@ -154,7 +154,7 @@ class PathDataset(DatasetMixin):
             exclude_checker = re.compile(exclude_key)
 
         dirs = []
-        for d in sorted(dataset_root.glob('*')):
+        for d in sorted(dataset_root.glob('**/*'+ext)):
             if not os.path.isdir(d):
                 continue
 
