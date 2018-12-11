@@ -16,7 +16,6 @@ from chainer.dataset import to_device
 from chainer.dataset.convert import _concat_arrays
 
 
-
 class NPZDataset(DatasetMixin):
 
     def __init__(self, dataset_root, include_key=None, exclude_key=None, label_dct=None, param_file="datasetparam.json"):
@@ -158,7 +157,7 @@ class PathDataset(DatasetMixin):
         if label_dct is None:
             label_dct = {}
         for d in dirs:
-            tmp = sorted(list(d.glob('**/*'+ext)))
+            tmp = sorted(list(d.glob('**/*' + ext)))
 
             if len(tmp) == 0:
                 continue
@@ -180,7 +179,6 @@ class PathDataset(DatasetMixin):
 
         self._paths = paths
         self.label_dct = label_dct
-
 
     def __len__(self):
         return len(self._paths)
@@ -206,9 +204,10 @@ class PathDataset(DatasetMixin):
                 break
 
         if path is None:
-            data = path = None
+            return None, None
 
-        return path, self.label_dct[path.parts[self.label_level]]
+        else:
+            return path, self.label_dct[path.parts[self.label_level]]
 
 
 def list_examples(batch, device=None, padding=None):
