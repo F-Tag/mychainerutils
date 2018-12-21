@@ -1,14 +1,17 @@
 
 from functools import partial
+from inspect import signature
 from math import ceil
 from warnings import warn
-from inspect import signature
-from functools import partial
 
 import chainer
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
+from chainer import configuration
+from chainer import functions as F
+from chainer import variable
+from chainer.backends import cuda
 
 from . import functions as mF
 
@@ -180,3 +183,36 @@ def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_re
         net.append(partial(F.dropout, ratio=dropout))
     net.append(L.Linear(n_out))
     return net
+
+
+class MovingAverageSubtractor(L.BatchNormalization):
+    def __init__(self, size=None, decay=0.9, eps=2e-05, dtype=None, axis=None, initial_avg_mean=None):
+        super().__init__(size=size, decay=decay, eps=eps, dtype=dtype, use_gamma=False, use_beta=False, initial_gamma=None, initial_beta=None, axis=axis, initial_avg_mean=initial_avg_mean, initial_avg_var=None)
+    
+    def _initialize_params(self, shape):
+        super()._initialize_params(shape)
+        delattr(self, "avg_var")
+        delattr(self, "N")
+    
+    def forward(self, x):
+
+        with cuda.get_device_from_id(self._device_id):
+            gamma = avg_var = variable.Variable(self.xp.ones(
+                    self.avg_mean.shape, dtype=x.dtype))
+
+            beta = variable.Variable(self.xp.zeros(
+                    self.avg_mean.shape, dtype=x.dtype))
+            
+        if configuration.config.train:
+            decay = self.decay
+            ret = F.batch_normalization(
+                x, gamma, beta, eps=self.eps, running_mean=self.avg_mean,
+                running_var=avg_var, decay=decay)
+            
+        else:
+            mean = variable.Variable(self.avg_mean)
+            var = variable.Variable(avg_var)
+            ret = F.fixed_batch_normalization(
+                x, gamma, beta, mean, var, self.eps)
+        
+        return ret
