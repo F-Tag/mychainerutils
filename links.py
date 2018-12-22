@@ -199,20 +199,18 @@ class MovingAverageSubtractor(L.BatchNormalization):
         with cuda.get_device_from_id(self._device_id):
             gamma = avg_var = variable.Variable(self.xp.ones(
                     self.avg_mean.shape, dtype=x.dtype))
-
             beta = variable.Variable(self.xp.zeros(
                     self.avg_mean.shape, dtype=x.dtype))
             
         if configuration.config.train:
             decay = self.decay
-            ret = F.batch_normalization(
+            F.batch_normalization(
                 x, gamma, beta, eps=self.eps, running_mean=self.avg_mean,
                 running_var=avg_var, decay=decay)
             
-        else:
-            mean = variable.Variable(self.avg_mean)
-            var = variable.Variable(avg_var)
-            ret = F.fixed_batch_normalization(
-                x, gamma, beta, mean, var, self.eps)
+        mean = variable.Variable(self.avg_mean)
+        var = variable.Variable(avg_var)
+        ret = F.fixed_batch_normalization(
+            x, gamma, beta, mean, var, self.eps)
         
         return ret
