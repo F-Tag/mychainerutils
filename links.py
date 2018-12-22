@@ -197,9 +197,9 @@ class MovingAverageSubtractor(L.BatchNormalization):
     def forward(self, x):
 
         with cuda.get_device_from_id(self._device_id):
-            gamma = avg_var = variable.Variable(self.xp.ones(
+            gamma = avg_var = chainer.as_variable(self.xp.ones(
                     self.avg_mean.shape, dtype=x.dtype))
-            beta = variable.Variable(self.xp.zeros(
+            beta = chainer.as_variable(self.xp.zeros(
                     self.avg_mean.shape, dtype=x.dtype))
             
         if configuration.config.train:
@@ -208,8 +208,8 @@ class MovingAverageSubtractor(L.BatchNormalization):
                 x, gamma, beta, eps=self.eps, running_mean=self.avg_mean,
                 running_var=avg_var, decay=decay)
             
-        mean = variable.Variable(self.avg_mean)
-        var = variable.Variable(avg_var)
+        mean = chainer.as_variable(self.avg_mean)
+        var = chainer.as_variable(avg_var)
         ret = F.fixed_batch_normalization(
             x, gamma, beta, mean, var, self.eps)
         
