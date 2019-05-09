@@ -20,7 +20,7 @@ class TSRegressor(L.Classifier):
     compute_accuracy = False
 
     def __init__(self, predictor,
-                 lossfun=F.absolute_error, label_key=-1, return_key=None):
+                 lossfun=F.absolute_error, label_key=-1, return_key=None, delta=True, deltadelta=True):
 
         try:
             signature(lossfun).parameters['reduce']
@@ -33,6 +33,8 @@ class TSRegressor(L.Classifier):
                          lossfun=F.absolute_error,
                          label_key=label_key)
         self.return_key = return_key
+        self.delta=True
+        self.deltadelta=True
 
     def __call__(self, *args, **kwargs):
 
@@ -64,6 +66,36 @@ class TSRegressor(L.Classifier):
         diff = self.lossfun(F.concat(self.y, axis=0), F.concat(t, axis=0))
         self.loss = F.sum(diff) / batch
         chainer.reporter.report({'loss': self.loss}, self)
+
+        if self.delta:
+            arr1 = [arr[:-2] for arr in self.y]
+            arr2 = [arr[2:] for arr in self.y]
+            arr_y = 0.5 * F.concat(arr2, axis=0) - 0.5 * F.concat(arr1, axis=0)
+
+            arr1 = [arr[:-2] for arr in t]
+            arr2 = [arr[2:] for arr in t]
+            arr_t = 0.5 * F.concat(arr2, axis=0) - 0.5 * F.concat(arr1, axis=0)
+
+            loss = F.sum(self.lossfun(arr_y, arr_t)) / batch
+            chainer.reporter.report({'delta': loss}, self)
+            self.loss += loss
+
+        if self.deltadelta:
+            arr1 = [arr[:-2] for arr in self.y]
+            arr2 = [arr[2:] for arr in self.y]
+            arr3 = [arr[1:-1] for arr in self.y]
+            arr_y = F.concat(arr2, axis=0) + F.concat(arr1, axis=0) - 2 * F.concat(arr3, axis=0)
+
+            arr1 = [arr[:-2] for arr in t]
+            arr2 = [arr[2:] for arr in t]
+            arr3 = [arr[1:-1] for arr in t]
+            arr_t = F.concat(arr2, axis=0) + F.concat(arr1, axis=0) - 2 * F.concat(arr3, axis=0)
+
+            loss = F.sum(self.lossfun(arr_y, arr_t)) / batch
+            chainer.reporter.report({'deltadelta': loss}, self)
+            self.loss += loss
+
+
         return self.loss
 
 
