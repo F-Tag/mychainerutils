@@ -246,3 +246,8 @@ class MovingAverageSubtractor(L.BatchNormalization):
             x, gamma, beta, mean, var, self.eps)
         
         return ret
+
+
+class NormalizedEmbedID(L.EmbedID):
+    def forward(self, x):
+        return F.normalize(super().forward(x))
