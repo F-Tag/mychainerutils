@@ -90,7 +90,7 @@ class NPZDataset(DatasetMixin):
 
     def get_example(self, i):
         path = self._paths[i]
-        tmp = dict(np.load(path))
+        tmp = dict(np.load(path, mmap_mode="r"))
         tmp['label'] = self.label_dct[path.parts[self.label_level]]
         return tmp
 
