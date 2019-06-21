@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-# This script was copied from
+# This script was copied from:
 # https://raw.githubusercontent.com/r9y9/deepvoice3_pytorch/master/hparam_tf/hparam.py
 
 """Hyperparameter values."""
