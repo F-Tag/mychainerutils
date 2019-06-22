@@ -91,7 +91,8 @@ class NPZDataset(DatasetMixin):
     def get_example(self, i):
         path = self._paths[i]
         tmp = dict(np.load(path, mmap_mode="r"))
-        tmp['label'] = self.label_dct[path.parts[self.label_level]]
+        tmp["label_name"] = path.parts[self.label_level]
+        tmp['label'] = self.label_dct[tmp["label_name"]]
         return tmp
 
     def get_example_from_names(self, names, random=True):
