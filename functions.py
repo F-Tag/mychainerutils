@@ -112,3 +112,7 @@ def bilinear_interpolation_1d(x, rate=None, shape=None):
     x = F.resize_images(x, (shape, 1))
     return F.squeeze(x, -1)
 
+
+def gated_activation(x, activation=F.tanh):
+    arr1, arr2 = F.split_axis(x, 2, axis=1)
+    return F.sigmoid(arr1) * (activation(arr2) if activation is not None else arr2)
