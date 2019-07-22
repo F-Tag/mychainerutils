@@ -115,7 +115,9 @@ def bilinear_interpolation_1d(x, rate=None, shape=None):
 
 def gated_activation(x, activation=F.tanh):
     arr1, arr2 = F.split_axis(x, 2, axis=1)
-    return F.sigmoid(arr1) * (activation(arr2) if activation is not None else arr2)
+    return F.sigmoid(
+        arr1) * (activation(
+            arr2) if activation is not None else arr2)
 
 
 def delta_feature(x, static=True, delta=True, deltadelta=True):
