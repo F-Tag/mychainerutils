@@ -101,7 +101,7 @@ def softsign(x):
 def bilinear_interpolation_1d(x, rate=None, shape=None):
     length = x.shape[-1]
     if rate is not None:
-        shape = int(length*rate)
+        shape = int(length * rate)
     else:
         if shape is None:
             raise Exception('rate or shape')
@@ -116,3 +116,38 @@ def bilinear_interpolation_1d(x, rate=None, shape=None):
 def gated_activation(x, activation=F.tanh):
     arr1, arr2 = F.split_axis(x, 2, axis=1)
     return F.sigmoid(arr1) * (activation(arr2) if activation is not None else arr2)
+
+
+def delta_feature(x, static=True, delta=True, deltadelta=True):
+
+    length = None
+    dim2_flag = False
+    if isinstance(x, list) or isinstance(x, tuple):
+        length = [len(arr) for arr in x]
+        x = F.pad_sequence(x).transpose(0, 2, 1)
+
+    elif x.ndim == 2:
+        x = x[None].transpose(0, 2, 1)
+        dim2_flag = True
+
+    outs = []
+    if static:
+        outs.append(x)
+
+    x = F.pad(x, ((0, 0), (0, 0), (1, 1)), 'constant', constant_values=0)
+    if delta:
+        outs.append((x[..., 2:] - x[..., :-2]) / 2.0)
+
+    if deltadelta:
+        outs.append(x[..., 2:] + x[..., :-2] - 2 * x[..., 1:-1])
+
+    out = F.concat(outs, 1)
+
+    if length is not None:
+        out = [arr[:l] for arr, l in zip(F.separate(
+            out.transpose(0, 2, 1), axis=0), length)]
+
+    elif dim2_flag:
+        out = F.squeeze(out.transpose(0, 2, 1), 0)
+
+    return out
