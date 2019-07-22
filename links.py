@@ -33,8 +33,8 @@ class TSRegressor(L.Classifier):
                          lossfun=F.absolute_error,
                          label_key=label_key)
         self.return_key = return_key
-        self.delta=True
-        self.deltadelta=True
+        self.delta = True
+        self.deltadelta = True
 
     def __call__(self, *args, **kwargs):
 
@@ -84,17 +84,18 @@ class TSRegressor(L.Classifier):
             arr1 = [arr[:-2] for arr in self.y]
             arr2 = [arr[2:] for arr in self.y]
             arr3 = [arr[1:-1] for arr in self.y]
-            arr_y = F.concat(arr2, axis=0) + F.concat(arr1, axis=0) - 2 * F.concat(arr3, axis=0)
+            arr_y = F.concat(arr2, axis=0) + F.concat(arr1,
+                                                      axis=0) - 2 * F.concat(arr3, axis=0)
 
             arr1 = [arr[:-2] for arr in t]
             arr2 = [arr[2:] for arr in t]
             arr3 = [arr[1:-1] for arr in t]
-            arr_t = F.concat(arr2, axis=0) + F.concat(arr1, axis=0) - 2 * F.concat(arr3, axis=0)
+            arr_t = F.concat(arr2, axis=0) + F.concat(arr1,
+                                                      axis=0) - 2 * F.concat(arr3, axis=0)
 
             loss = F.sum(self.lossfun(arr_y, arr_t)) / batch
             chainer.reporter.report({'deltadelta': loss}, self)
             self.loss += loss
-
 
         return self.loss
 
@@ -219,35 +220,56 @@ def build_mlp(n_out, n_units=256, layers=5, normalize=None, activation='leaky_re
 
 class MovingAverageSubtractor(L.BatchNormalization):
     def __init__(self, size=None, decay=0.9, eps=2e-05, dtype=None, axis=None, initial_avg_mean=None):
-        super().__init__(size=size, decay=decay, eps=eps, dtype=dtype, use_gamma=False, use_beta=False, initial_gamma=None, initial_beta=None, axis=axis, initial_avg_mean=initial_avg_mean, initial_avg_var=None)
-    
+        super().__init__(size=size, decay=decay, eps=eps, dtype=dtype, use_gamma=False, use_beta=False,
+                         initial_gamma=None, initial_beta=None, axis=axis, initial_avg_mean=initial_avg_mean, initial_avg_var=None)
+
     def _initialize_params(self, shape):
         super()._initialize_params(shape)
         delattr(self, "avg_var")
         delattr(self, "N")
-    
+
     def forward(self, x):
 
         with cuda.get_device_from_id(self._device_id):
             gamma = avg_var = chainer.as_variable(self.xp.ones(
-                    self.avg_mean.shape, dtype=x.dtype))
+                self.avg_mean.shape, dtype=x.dtype))
             beta = chainer.as_variable(self.xp.zeros(
-                    self.avg_mean.shape, dtype=x.dtype))
-            
+                self.avg_mean.shape, dtype=x.dtype))
+
         if configuration.config.train:
             decay = self.decay
             F.batch_normalization(
                 x, gamma, beta, eps=self.eps, running_mean=self.avg_mean,
                 running_var=avg_var, decay=decay)
-            
+
         mean = chainer.as_variable(self.avg_mean)
         var = chainer.as_variable(avg_var)
         ret = F.fixed_batch_normalization(
             x, gamma, beta, mean, var, self.eps)
-        
+
         return ret
 
 
 class NormalizedEmbedID(L.EmbedID):
     def forward(self, x):
         return F.normalize(super().forward(x))
+
+
+class EmbDecID(L.EmbedID):
+    def __init__(self, in_size, out_size, initialW=None,
+                 ignore_label=None, dec_mask_idx=None):
+        super().__init__(in_size, out_size, initialW, ignore_label)
+
+        if dec_mask_idx is not None:
+            dec_mask = np.zeros(in_size, dtype=self.W.dtype)
+            dec_mask[dec_mask_idx] = -np.inf
+            self.add_persistent("dec_mask", dec_mask)
+
+    def forward(self, x, decode=False):
+        if not decode:
+            return super().forward(x)
+        else:
+            out = F.linear(x, self.W)
+            if hasattr(self, "dec_mask"):
+                out += self.dec_mask
+            return out
