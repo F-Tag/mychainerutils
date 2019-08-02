@@ -1,5 +1,7 @@
 
 import numpy as np
+from os import environ
+from pathlib import Path
 
 
 def get_shuffled_example(length):
@@ -20,3 +22,27 @@ def get_shuffled_example(length):
         shuffled[dup_index] = shuffled[dup_index][ch_s_index]
     
     return shuffled
+
+def get_datasetroot():
+    if "DATASET_ROOT" in environ:
+        ret = Path(environ["DATASET_ROOT"])
+    else:
+        ret = Path("~", "dataset")
+
+    ret = ret.expanduser()
+
+    ret.mkdir(exist_ok=True, parents=True)
+
+    return ret
+
+def get_saveroot():
+    if "SAVE_ROOT" in environ:
+        ret = Path(environ["SAVE_ROOT"])
+    else:
+        ret = Path("./results")
+
+    ret = ret.expanduser()
+
+    ret.mkdir(exist_ok=True, parents=True)
+
+    return ret
