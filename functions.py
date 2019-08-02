@@ -153,3 +153,13 @@ def delta_feature(x, static=True, delta=True, deltadelta=True):
         out = F.squeeze(out.transpose(0, 2, 1), 0)
 
     return out
+
+
+def to_finite(arr):
+    arr = chainer.as_variable(arr)
+    xp = arr.xp
+    dtype = arr.dtype
+
+    return F.where(xp.isfinite(arr.array),
+                   arr,
+                   xp.array(0.0, dtype=dtype))
