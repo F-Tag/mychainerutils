@@ -160,6 +160,11 @@ def to_finite(arr):
     xp = arr.xp
     dtype = arr.dtype
 
-    return F.where(xp.isfinite(arr.array),
-                   arr,
-                   xp.array(0.0, dtype=dtype))
+    condition = xp.isfinite(arr.array)
+    if condition.all():
+        ret = arr
+    else:
+        ret = F.where(condition,
+                      arr,
+                      xp.array(0.0, dtype=dtype))
+    return ret
