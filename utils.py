@@ -56,3 +56,12 @@ def to_numpy(v):
     v = chainer.as_variable(v)
     v.to_cpu()
     return v.array
+
+
+def get_loss_scale():
+    if chainer.config.dtype == chainer.mixed16:
+        ret = "dynamic"
+    else:
+        ret = None
+
+    return ret
