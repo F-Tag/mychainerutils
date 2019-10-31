@@ -168,3 +168,25 @@ def to_finite(arr):
                       arr,
                       xp.array(0.0, dtype=dtype))
     return ret
+
+
+class GradientScale(chainer.function_node.FunctionNode):
+
+    def __init__(self, lmbd):
+        self.lmbd = lmbd
+
+    def forward(self, inputs):
+        return inputs
+
+    def backward(self, inputs, grad_outputs):
+        gy, = grad_outputs
+        return self.lmbd * gy,
+
+
+def gradient_scale(x, lmbd=-1.0):
+    """
+    Scale gradient in bakprop.
+    if lmbd = -1.0, this is equivalent to gradient reversal layer.
+    """
+    y, = GradientScale(lmbd).apply((x,))
+    return y
