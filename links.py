@@ -311,7 +311,8 @@ class MovingAverageNormalization(L.BatchNormalization):
                 reshape_axis.append(self.avg_var.shape[counter])
                 counter += 1
 
-        ret = x * self.avg_var.reshape(reshape_axis) + \
-            (self.avg_mean.reshape(reshape_axis) ** 0.5)
+        avg_mean = self.avg_mean.reshape(reshape_axis)
+        avg_var = self.avg_var.reshape(reshape_axis)
+        ret = x * (avg_var ** 0.5) + avg_mean
 
         return ret
