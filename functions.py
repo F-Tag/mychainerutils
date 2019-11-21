@@ -190,3 +190,10 @@ def gradient_scale(x, lmbd=-1.0):
     """
     y, = GradientScale(lmbd).apply((x,))
     return y
+
+
+def irfft(real, imag):
+    real = F.concat((real, F.flip(real[..., 1:-1], -1)), -1)
+    imag = F.concat((imag, F.flip(-imag[..., 1:-1], -1)), -1)
+    ret, _ = F.ifft((real, imag))
+    return ret
