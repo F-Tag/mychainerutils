@@ -273,3 +273,45 @@ class EmbDecID(L.EmbedID):
             if hasattr(self, "dec_mask"):
                 out += self.dec_mask
             return out
+
+
+class MovingAverageNormalization(L.BatchNormalization):
+
+    def __init__(self, size=None, decay=0.9, eps=2e-5, dtype=None,
+                 initial_gamma=None, initial_beta=None, axis=None,
+                 initial_avg_mean=None, initial_avg_var=None):
+
+        super().__init__(
+            size=size, decay=decay, eps=eps,
+            dtype=dtype, use_gamma=False, use_beta=False,
+            initial_gamma=initial_gamma, initial_beta=initial_beta, axis=axis,
+            initial_avg_mean=initial_avg_mean, initial_avg_var=initial_avg_var)
+
+    def forward(self, x):
+        ret = super().forward(x)
+        if chainer.config.train:
+            with chainer.using_config("train", False):
+                ret = super().forward(x)
+
+        return ret
+
+    def inverse_transform(self, x):
+
+        if not hasattr(self, "avg_mean"):
+            return x
+        elif self.avg_mean is None:
+            return x
+
+        reshape_axis = []
+        counter = 0
+        for i in range(x.ndim):
+            if i in self.axis:
+                reshape_axis.append(1)
+            else:
+                reshape_axis.append(self.avg_var.shape[counter])
+                counter += 1
+
+        ret = x * self.avg_var.reshape(reshape_axis) + \
+            (self.avg_mean.reshape(reshape_axis) ** 0.5)
+
+        return ret
