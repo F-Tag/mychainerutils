@@ -186,7 +186,9 @@ class PathDataset(DatasetMixin):
 
     def get_example(self, i):
         path = self._paths[i]
-        return path, self.label_dct[path.parts[self.label_level]]
+        label_name = path.parts[self.label_level]
+        label = self.label_dct[label_name]
+        return path, label, label_name
 
     def get_example_from_names(self, names, random=True):
         names = deepcopy(names)
