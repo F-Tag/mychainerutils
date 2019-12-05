@@ -132,18 +132,22 @@ def delta_feature(x, static=True, delta=True, deltadelta=True):
         x = x[None].transpose(0, 2, 1)
         dim2_flag = True
 
-    outs = []
+    x = F.expand_dims(x, 1)
+    xp = x.xp
+    dtype = x.dtype
+
+    ws = []
     if static:
-        outs.append(x)
-
-    x = F.pad(x, ((0, 0), (0, 0), (1, 1)), 'constant', constant_values=0)
+        ws.append(xp.array((0, 1, 0)).astype(dtype).reshape(1, 1, 1, -1))
     if delta:
-        outs.append((x[..., 2:] - x[..., :-2]) / 2.0)
-
+        ws.append(xp.array((-0.5, 0, 0.5)).astype(dtype).reshape(1, 1, 1, -1))
     if deltadelta:
-        outs.append(x[..., 2:] + x[..., :-2] - 2 * x[..., 1:-1])
+        ws.append(xp.array((1.0, -2.0, 1.0)).astype(dtype).reshape(1, 1, 1, -1))
+    W = xp.vstack(ws)
 
-    out = F.concat(outs, 1)
+    out = F.convolution_2d(x, W, pad=(0, 1))
+    B, T = out.shape[0], out.shape[-1]
+    out = out.reshape(B, -1, T)
 
     if length is not None:
         out = [arr[:l] for arr, l in zip(F.separate(
