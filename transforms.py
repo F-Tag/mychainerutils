@@ -11,8 +11,6 @@ def cutout(image_origin, mask_ratio=0.33):
     """
 
     image = np.copy(image_origin).T
-    mask_value = image.mean(
-        tuple(np.arange(image.ndim)[:-1].tolist())).astype(image_origin.dtype)
 
     h, w = image.shape[1:3]
     mask_h = int(h * mask_ratio)
@@ -26,6 +24,9 @@ def cutout(image_origin, mask_ratio=0.33):
         top = 0
     if left < 0:
         left = 0
+
+    mask_value = image[:, top:bottom, left:right].mean(
+        tuple(np.arange(image.ndim)[:-1].tolist())).astype(image_origin.dtype)
 
     image[:, top:bottom, left:right] = mask_value
     image = image.T
