@@ -108,6 +108,7 @@ class WeightNormalization(link_hook.LinkHook):
 
         g = get_norm(initialW.xp, initialW.array, self.eps, axis=self.axis)
         getattr(link, self.g_name).array = g
+        link.cleargrads()
 
         self._initialized = True
 
