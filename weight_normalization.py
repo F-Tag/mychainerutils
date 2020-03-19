@@ -57,7 +57,6 @@ class WeightNormalization(link_hook.LinkHook):
 
         with link.init_scope():
             setattr(link, self.g_name, variable.Parameter())
-        link.cleargrads()
 
         if getattr(link, self.weight_name).array is not None:
             self._prepare_parameters(link)
