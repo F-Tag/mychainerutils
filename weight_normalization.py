@@ -106,8 +106,9 @@ class WeightNormalization(link_hook.LinkHook):
                 'Expect {}.shape[{}] > 0'.format(self.weight_name, self.axis)
             )
 
-        g = get_norm(initialW.xp, initialW.array, self.eps, axis=self.axis)
-        getattr(link, self.g_name).array = g
+        if getattr(link, self.g_name).array is None:
+            g = get_norm(initialW.xp, initialW.array, self.eps, axis=self.axis)
+            getattr(link, self.g_name).array = g
 
         self._initialized = True
 
