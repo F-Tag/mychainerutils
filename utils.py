@@ -3,6 +3,7 @@ from os import environ
 from pathlib import Path
 
 import chainer
+import chainer.functions as F
 import numpy as np
 
 
@@ -53,9 +54,7 @@ def get_saveroot():
 
 
 def to_numpy(v):
-    v = chainer.as_variable(v)
-    v.to_cpu()
-    return v.array
+    return F.copy(chainer.as_variable(v), -1).array
 
 
 def get_loss_scale():
@@ -65,3 +64,10 @@ def get_loss_scale():
         ret = None
 
     return ret
+
+
+def del_link_hooks(chain, name="WeightNormalization"):
+    for link in chain.children():
+        if name in link.local_link_hooks:
+            link.delete_hook(name)
+        del_link_hooks(link, name)
