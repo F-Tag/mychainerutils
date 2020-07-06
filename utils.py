@@ -71,3 +71,10 @@ def del_link_hooks(chain, name="WeightNormalization"):
         if name in link.local_link_hooks:
             link.delete_hook(name)
         del_link_hooks(link, name)
+
+
+def set_config(func, name, value):
+    def ret(*args, **kwargs):
+        with chainer.using_config(name, value):
+            return func(*args, **kwargs)
+    return ret
