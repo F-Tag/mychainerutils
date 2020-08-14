@@ -51,7 +51,7 @@ class CosineAnnealing(extension.Extension):
         i = numpy.where(t_cmsm<0)[0][0]
         # local iteration (in cycle i, at global iteration t)
         T_i = T_0 * (T_mult**i)
-        t_i = int(_t - (T_i - T_0)/(T_mult - 1)) + 1
+        t_i = int(_t - (T_i - T_0)/max(T_mult - 1, 1)) + 1
         lr = vmin + (vmax-vmin) * 0.5 * (1 + cos(pi*(t_i-1)/T_i)) 
 
         self._update_value(optimizer, lr)
