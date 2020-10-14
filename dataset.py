@@ -6,13 +6,10 @@ from copy import deepcopy
 from glob import glob
 from pathlib import Path
 from random import shuffle
-import six
-from chainer.backends import cuda
 
-import chainer
 import numpy as np
-from chainer.dataset import DatasetMixin
-from chainer.dataset import to_device
+import six
+from chainer.dataset import DatasetMixin, to_device
 from chainer.dataset.convert import _concat_arrays
 
 
@@ -139,18 +136,13 @@ class PathDataset(DatasetMixin):
         for d in sorted(dataset_root.glob('*')):
             if not os.path.isdir(d):
                 continue
-
-            if include_key is not None:
-                if include_checker.search(os.path.basename(d)) is not None:
-                    dirs.append(d)
+            if exclude_key is not None:
+                if exclude_checker.search(os.path.basename(d)) is not None:
                     continue
-            else:
-                if exclude_key is not None:
-                    if exclude_checker.search(os.path.basename(d)) is None:
-                        dirs.append(d)
-
-                else:
-                    dirs.append(d)
+            if include_key is not None:
+                if include_checker.search(os.path.basename(d)) is None:
+                    continue
+            dirs.append(d)
 
         paths = []
         labels = []
