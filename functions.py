@@ -154,17 +154,18 @@ def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
         if deltadelta:
             ws.append(xp.array((-1, 16, -30, 16, -1)) / 12)
         pad = 2
-        
+
     else:
         raise ValueError(f"order: {order}")
-
     W = xp.expand_dims(xp.vstack(ws), (1, 2)).astype(dtype)
 
     print(x.shape)
+    pad_width = [(0, 0)]*3 + [(pad, pad)]
+    x = F.pad(x, pad_width, mode="reflect")
+    print(x.shape)
     import sys
     sys.exit()
-
-    out = F.convolution_2d(x, W, pad=(0, pad))
+    out = F.convolution_2d(x, W)
     B, T = out.shape[0], out.shape[-1]
     out = out.reshape(B, -1, T)
 
