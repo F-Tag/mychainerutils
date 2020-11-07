@@ -120,7 +120,7 @@ def gated_activation(x, activation=F.tanh):
             arr2) if activation is not None else arr2)
 
 
-def delta_feature(x, static=True, delta=True, deltadelta=True):
+def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
 
     length = None
     dim2_flag = False
@@ -137,15 +137,33 @@ def delta_feature(x, static=True, delta=True, deltadelta=True):
     dtype = x.dtype
 
     ws = []
-    if static:
-        ws.append(xp.array((0, 1, 0)).astype(dtype).reshape(1, 1, 1, -1))
-    if delta:
-        ws.append(xp.array((-0.5, 0, 0.5)).astype(dtype).reshape(1, 1, 1, -1))
-    if deltadelta:
-        ws.append(xp.array((1.0, -2.0, 1.0)).astype(dtype).reshape(1, 1, 1, -1))
-    W = xp.vstack(ws)
+    if order == 2:
+        if static:
+            ws.append(xp.array((0, 1, 0)))
+        if delta:
+            ws.append(xp.array((-1, 0, 1)) / 2)
+        if deltadelta:
+            ws.append(xp.array((1.0, -2.0, 1.0)))
+        pad = 1
 
-    out = F.convolution_2d(x, W, pad=(0, 1))
+    if order == 4:
+        if static:
+            ws.append(xp.array((0, 0, 1, 0, 0)))
+        if delta:
+            ws.append(xp.array((1, -8, 0, 8, -1)) / 12)
+        if deltadelta:
+            ws.append(xp.array((-1, 16, -30, 16, -1)) / 12)
+        pad = 2
+    else:
+        raise ValueError(f"order: {order}")
+
+    W = xp.expand_dims(xp.vstack(ws), (1, 2)).astype(dtype)
+
+    print(x.shape)
+    import sys
+    sys.exit()
+
+    out = F.convolution_2d(x, W, pad=(0, pad))
     B, T = out.shape[0], out.shape[-1]
     out = out.reshape(B, -1, T)
 
