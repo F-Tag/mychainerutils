@@ -120,7 +120,7 @@ def gated_activation(x, activation=F.tanh):
             arr2) if activation is not None else arr2)
 
 
-def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
+def delta_feature(x, order=4, static=True, delta=True, deltadelta=True):
 
     length = None
     dim2_flag = False
@@ -159,13 +159,9 @@ def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
         raise ValueError(f"order: {order}")
     W = xp.expand_dims(xp.vstack(ws), (1, 2)).astype(dtype)
 
-    print(x.shape)
     pad_width = [(0, 0)]*3 + [(pad, pad)]
     x = F.pad(x, pad_width, mode="reflect")
     out = F.convolution_2d(x, W)
-    print(out.shape)
-    import sys
-    sys.exit()
     B, T = out.shape[0], out.shape[-1]
     out = out.reshape(B, -1, T)
 
