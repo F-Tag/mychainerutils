@@ -146,7 +146,7 @@ def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
             ws.append(xp.array((1.0, -2.0, 1.0)))
         pad = 1
 
-    if order == 4:
+    elif order == 4:
         if static:
             ws.append(xp.array((0, 0, 1, 0, 0)))
         if delta:
@@ -154,6 +154,7 @@ def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
         if deltadelta:
             ws.append(xp.array((-1, 16, -30, 16, -1)) / 12)
         pad = 2
+        
     else:
         raise ValueError(f"order: {order}")
 
