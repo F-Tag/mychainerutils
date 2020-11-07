@@ -162,10 +162,10 @@ def delta_feature(x, order=2, static=True, delta=True, deltadelta=True):
     print(x.shape)
     pad_width = [(0, 0)]*3 + [(pad, pad)]
     x = F.pad(x, pad_width, mode="reflect")
-    print(x.shape)
+    out = F.convolution_2d(x, W)
+    print(out.shape)
     import sys
     sys.exit()
-    out = F.convolution_2d(x, W)
     B, T = out.shape[0], out.shape[-1]
     out = out.reshape(B, -1, T)
 
