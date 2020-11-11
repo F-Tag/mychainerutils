@@ -139,25 +139,26 @@ def delta_feature(x, order=4, static=True, delta=True, deltadelta=True):
     ws = []
     if order == 2:
         if static:
-            ws.append(xp.array((0, 1, 0)))
+            ws.append(np.array((0, 1, 0)))
         if delta:
-            ws.append(xp.array((-1, 0, 1)) / 2)
+            ws.append(np.array((-1, 0, 1)) / 2)
         if deltadelta:
-            ws.append(xp.array((1.0, -2.0, 1.0)))
+            ws.append(np.array((1.0, -2.0, 1.0)))
         pad = 1
 
     elif order == 4:
         if static:
-            ws.append(xp.array((0, 0, 1, 0, 0)))
+            ws.append(np.array((0, 0, 1, 0, 0)))
         if delta:
-            ws.append(xp.array((1, -8, 0, 8, -1)) / 12)
+            ws.append(np.array((1, -8, 0, 8, -1)) / 12)
         if deltadelta:
-            ws.append(xp.array((-1, 16, -30, 16, -1)) / 12)
+            ws.append(np.array((-1, 16, -30, 16, -1)) / 12)
         pad = 2
 
     else:
         raise ValueError(f"order: {order}")
-    W = xp.expand_dims(xp.vstack(ws), (1, 2)).astype(dtype)
+    W = np.expand_dims(np.vstack(ws), (1, 2)).astype(dtype)
+    W = xp.array(W)
 
     pad_width = [(0, 0)]*3 + [(pad, pad)]
     x = F.pad(x, pad_width, mode="reflect")
