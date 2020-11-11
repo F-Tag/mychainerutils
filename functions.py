@@ -157,8 +157,7 @@ def delta_feature(x, order=4, static=True, delta=True, deltadelta=True):
 
     else:
         raise ValueError(f"order: {order}")
-    W = np.expand_dims(np.vstack(ws), (1, 2)).astype(dtype)
-    W = xp.array(W)
+    W = xp.array(np.expand_dims(np.vstack(ws), (1, 2))).astype(dtype)
 
     pad_width = [(0, 0)]*3 + [(pad, pad)]
     x = F.pad(x, pad_width, mode="reflect")
