@@ -217,3 +217,12 @@ def irfft(real, imag):
     imag = F.concat((imag, F.flip(-imag[..., 1:-1], -1)), -1)
     ret, _ = F.ifft((real, imag))
     return ret
+
+
+def stats_pooling(x, mean_only=False):
+    mean = F.mean(x, axis=-1)
+    if mean_only:
+        return mean
+    var = F.mean(x**2, axis=-1) - mean**2
+    std = F.sqrt(F.clip(var, 0, np.inf))
+    return F.concat((mean, std), axis=1)
