@@ -217,3 +217,14 @@ def irfft(real, imag):
     imag = F.concat((imag, F.flip(-imag[..., 1:-1], -1)), -1)
     ret, _ = F.ifft((real, imag))
     return ret
+
+
+def depthwise_normalization(x):
+    x = chainer.as_variable(x)
+    dim = x.shape[1]
+    xp = x.xp
+    dtype = x.dtype
+
+    gamma = xp.ones(dim, dtype=dtype)
+    beta = xp.zeros(dim, dtype=dtype)
+    return F.group_normalization(x, dim, gamma, beta)
